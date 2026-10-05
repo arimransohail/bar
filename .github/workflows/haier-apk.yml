@@ -40,6 +40,9 @@ jobs:
           unzip -q /tmp/haier_source.zip -d /tmp/haier
           cd /tmp/haier/haier_43s81_remote_v0_3
           sed -i '/android {/a\    compileOptions {\n        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17\n        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17\n    }' app/build.gradle.kts
+          sed -i 's/internal data class TvDevice/data class TvDevice/' app/src/main/java/com/sohail/haierremote/discovery/TvDiscovery.kt
+          sed -i '/import androidx.compose.foundation.layout.weight/d' app/src/main/java/com/sohail/haierremote/ui/RemoteScreen.kt
+          sed -i '/import androidx.compose.foundation.layout.weight/d' app/src/main/java/com/sohail/haierremote/ui/SetupScreen.kt
 
       - name: Build installable debug APK
         run: |
