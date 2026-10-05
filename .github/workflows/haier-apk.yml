@@ -39,20 +39,7 @@ jobs:
           mkdir -p /tmp/haier
           unzip -q /tmp/haier_source.zip -d /tmp/haier
           cd /tmp/haier/haier_43s81_remote_v0_3
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path("app/build.gradle.kts")
-          s=p.read_text()
-          needle="android {"
-          insert="""android {
-    compileOptions {
-        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
-        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
-    }"""
-          if "sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17" not in s:
-              s=s.replace(needle, insert, 1)
-          p.write_text(s)
-          PY
+          sed -i '/android {/a\    compileOptions {\n        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17\n        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17\n    }' app/build.gradle.kts
 
       - name: Build installable debug APK
         run: |
