@@ -31,13 +31,28 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Reconstruct source
+      - name: Reconstruct and prepare source
         run: |
           cat haier_remote_build/parts/0[0-7] > /tmp/haier_source.b64
           base64 -d /tmp/haier_source.b64 > /tmp/haier_source.zip
           unzip -t /tmp/haier_source.zip
           mkdir -p /tmp/haier
           unzip -q /tmp/haier_source.zip -d /tmp/haier
+          cd /tmp/haier/haier_43s81_remote_v0_3
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("app/build.gradle.kts")
+          s=p.read_text()
+          needle="android {"
+          insert="""android {
+    compileOptions {
+        sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17
+        targetCompatibility = org.gradle.api.JavaVersion.VERSION_17
+    }"""
+          if "sourceCompatibility = org.gradle.api.JavaVersion.VERSION_17" not in s:
+              s=s.replace(needle, insert, 1)
+          p.write_text(s)
+          PY
 
       - name: Build installable debug APK
         run: |
